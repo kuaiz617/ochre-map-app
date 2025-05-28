@@ -4,6 +4,12 @@
     import * as Table from '$lib/components/ui/table/index.js';
     import { MapLibre, DefaultMarker } from 'svelte-maplibre';
     import { type Coordinates } from '@digitalculture/ochre-sdk';
+
+    import SunIcon from "@lucide/svelte/icons/sun";
+  import MoonIcon from "@lucide/svelte/icons/moon";
+ 
+  import { toggleMode } from "mode-watcher";
+  import { Button } from "$lib/components/ui/button/index.js";
   
     const { data } = $props();
     const items = writable(data.set.items);
@@ -12,12 +18,18 @@
   
     // Object Type 
     const filteredItems = derived([query, items], ([$query, $items]) =>
-      $items.filter(item => {
-        const label = item.identification?.label?.toLowerCase() ?? '';
-        const objectType = item.properties?.find(p => p.label === 'Object type')?.values?.[0]?.content?.toLowerCase() ?? '';
-        return label.includes($query.toLowerCase()) || objectType.includes($query.toLowerCase());
-      })
+  $items.filter(item => {
+    const lowerQuery = $query.toLowerCase();
+    const label = item.identification?.label?.toLowerCase() ?? '';
+
+    const propertiesMatch = item.properties?.some(prop =>
+      prop.values?.some(v => v.content?.toLowerCase().includes(lowerQuery))
     );
+
+    return label.includes(lowerQuery) || propertiesMatch;
+  })
+);
+
   
     function toggleTheme() {
       darkMode.update(v => !v);
@@ -25,15 +37,16 @@
     }
   </script>
   
-  <!-- 🌗 Toggle Dark Mode Button -->
-  <div class="flex justify-end p-2">
-    <button
-      on:click={toggleTheme}
-      class="bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded text-sm shadow"
-    >
-      Toggle { $darkMode ? 'Light' : 'Dark' } Mode
-    </button>
-  </div>
+  <!--  Toggle Dark Mode Button -->
+  <Button onclick={toggleMode} variant="outline" size="icon">
+    <SunIcon
+      class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+    />
+    <MoonIcon
+      class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+    />
+    <span class="sr-only">Toggle theme</span>
+  </Button>
   
   <!-- Map -->
   <MapLibre
@@ -77,7 +90,7 @@
         {#each $filteredItems as item}
           <Table.Row>
             <Table.Cell class="font-medium">
-              <a href={`/item/${item.uuid}`} class="text-blue-600 underline">
+              <a href={`/item/${item.uuid}`} class="text-black-600 underline">
                 {item.identification?.label ?? '[No name]'}
               </a>
             </Table.Cell>

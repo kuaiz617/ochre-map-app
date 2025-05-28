@@ -1,12 +1,11 @@
+
+
+<!-- from the website: https://next.shadcn-svelte.com/docs/dark-mode/svelte -->
 <script lang="ts">
-	import '../app.css';
-</script>
-
-<!--<script>
-	import { ModeWatcher } from 'mode-watcher';
-  </script>
+  import "../app.css";
+  import { ModeWatcher } from "mode-watcher";
+  let { children } = $props();
+ </script>
   
-  <ModeWatcher /> <!-- 这行是关键 -->
-
-<slot />
-<!-- 保留页面内容插槽 -->
+ <ModeWatcher />
+ {@render children?.()}
