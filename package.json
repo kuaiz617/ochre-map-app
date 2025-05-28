@@ -50,6 +50,7 @@
 	},
 	"dependencies": {
 		"@digitalculture/ochre-sdk": "^0.7.22",
+		"mode-watcher": "^1.0.7",
 		"svelte-maplibre": "^1.0.0"
 	}
 }
